@@ -35,5 +35,25 @@ const Photos = (() => {
     return canvas.toDataURL('image/jpeg', 0.88);
   }
 
-  return { croppedDataUrl };
+  // Same image turned upside down, for the zine's upside-down panels.
+  const turned = new Map();
+  function rotated180(dataUrl) {
+    if (!turned.has(dataUrl)) {
+      turned.set(dataUrl, (async () => {
+        const bmp = await createImageBitmap(await (await fetch(dataUrl)).blob());
+        const canvas = document.createElement('canvas');
+        canvas.width = bmp.width;
+        canvas.height = bmp.height;
+        const g = canvas.getContext('2d');
+        g.translate(bmp.width, bmp.height);
+        g.rotate(Math.PI);
+        g.drawImage(bmp, 0, 0);
+        bmp.close?.();
+        return canvas.toDataURL('image/jpeg', 0.9);
+      })());
+    }
+    return turned.get(dataUrl);
+  }
+
+  return { croppedDataUrl, rotated180 };
 })();

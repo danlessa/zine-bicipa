@@ -9,7 +9,8 @@
   const state = {
     hotspot: null, // .species holds every candidate, most recently seen first
     photos: new Map(), // code → Wikiaves photo | null (none found)
-    pdfUrl: null,
+    pdfUrl: null, // imposed A4 sheet
+    pagesUrl: null, // 16 A7 pages in reading order
   };
 
   function store(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } }
@@ -142,7 +143,7 @@
     const species = selectedSpecies();
     renderSpeciesTable(species);
     const title = titleText();
-    const doc = await Zine.render(
+    const { sheet, pages } = await Zine.render(
       { ...state.hotspot, species },
       {
         title,
@@ -151,11 +152,14 @@
         onProgress: setStatus,
       },
     );
-    if (state.pdfUrl) URL.revokeObjectURL(state.pdfUrl);
-    state.pdfUrl = URL.createObjectURL(doc.output('blob'));
+    for (const url of [state.pdfUrl, state.pagesUrl]) if (url) URL.revokeObjectURL(url);
+    state.pdfUrl = URL.createObjectURL(sheet.output('blob'));
+    state.pagesUrl = URL.createObjectURL(pages.output('blob'));
     $('preview').src = state.pdfUrl;
     $('download').href = state.pdfUrl;
     $('download').download = `zine-${slug(title)}.pdf`;
+    $('download-pages').href = state.pagesUrl;
+    $('download-pages').download = `zine-${slug(title)}-paginas-a7.pdf`;
     $('step-pdf').hidden = false;
     const noPhoto = species.filter((sp) => !sp.photo).length;
     if (missingWikiaves().length) {

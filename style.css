@@ -136,7 +136,8 @@ button:disabled { opacity: 0.6; cursor: progress; }
   letter-spacing: 0.02em;
 }
 
-.actions { margin-bottom: 12px; }
+.actions { margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.secondary { font-weight: 600; }
 iframe {
   width: 100%;
   aspect-ratio: 297 / 210;

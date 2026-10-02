@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zine de Aves · Bicipassarinhar</title>
+  <link rel="icon" href="assets/logo.jpg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <img src="assets/logo.jpg" alt="" width="56" height="56">
+    <div>
+      <h1>Zine de aves</h1>
+      <p>Gere um checklist dobrável (A7) a partir de um hotspot do eBird · <a href="https://instagram.com/bicipassarinhar" target="_blank" rel="noopener">@bicipassarinhar</a></p>
+    </div>
+  </header>
+
+  <main>
+    <section class="card" id="step-data">
+      <h2><span class="step">1</span> Lista do eBird</h2>
+      <ol class="steps">
+        <li>Arraste este botão para a barra de favoritos do navegador:
+          <a id="bookmarklet" class="button bookmarklet" href="#">🐦 Zine Bicipá</a>
+          <small class="muted">(se você já tinha o favorito, arraste de novo para atualizar)</small></li>
+        <li>Abra a lista do hotspot no eBird, por exemplo
+          <a href="https://ebird.org/hotspot/L19543097/bird-list" target="_blank" rel="noopener">ebird.org/hotspot/L19543097/bird-list</a>.</li>
+        <li>Clique no favorito: o zine abre aqui, com as espécies vistas mais recentemente.</li>
+      </ol>
+      <p id="file-warning" class="warning" hidden>
+        O favorito não funciona com o app aberto direto do disco (<code>file://</code>). Publique a pasta
+        (ex.: GitHub Pages) ou rode <code>python3 -m http.server</code> e abra <code>http://localhost:8000</code>.
+      </p>
+      <details class="alt">
+        <summary>Alternativa: usar uma chave da API do eBird</summary>
+        <form id="api-form">
+          <label>
+            Link do hotspot no eBird
+            <input id="url" type="text" required
+                   placeholder="https://ebird.org/hotspot/L19543097/bird-list">
+          </label>
+          <label>
+            Chave da API do eBird
+            <input id="api-key" type="password" autocomplete="off" required placeholder="ex.: a1b2c3d4e5f6">
+            <small>Gratuita — peça a sua em <a href="https://ebird.org/api/keygen" target="_blank" rel="noopener">ebird.org/api/keygen</a>. Fica salva só neste navegador.</small>
+          </label>
+          <button type="submit" id="fetch-btn">Buscar espécies</button>
+        </form>
+      </details>
+      <p id="status" class="status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="card" id="step-edit" hidden>
+      <h2><span class="step">2</span> Capa e textos</h2>
+      <form id="edit-form">
+        <div class="row">
+          <label class="narrow">
+            Preposição
+            <select id="prep">
+              <option>da</option><option>de</option><option>do</option>
+              <option>das</option><option>dos</option>
+            </select>
+          </label>
+          <label class="grow">
+            Nome do local
+            <input id="place" type="text" required>
+          </label>
+        </div>
+        <p class="title-preview" id="title-preview"></p>
+        <label>
+          Frase da contracapa
+          <textarea id="phrase" rows="2">O Bicipá busca reconectar pessoas à natureza por meio da bike e da observação de aves.</textarea>
+        </label>
+        <div class="row">
+          <label class="narrow">
+            Máx. de espécies
+            <input id="max" type="number" min="1" max="84" value="84">
+          </label>
+        </div>
+        <div class="row">
+          <label class="grow">
+            Perfil na capa
+            <input id="handle" type="text" value="@bicipassarinhar">
+          </label>
+          <label class="grow">
+            Ordem das espécies
+            <select id="order">
+              <option value="taxonomic">Taxonômica (como no eBird)</option>
+              <option value="recent">Vistas mais recentemente primeiro</option>
+            </select>
+          </label>
+        </div>
+        <button type="submit" id="render-btn">Gerar PDF</button>
+      </form>
+    </section>
+
+    <section class="card" id="step-wikiaves" hidden>
+      <h2>Fotos do Wikiaves</h2>
+      <ol class="steps">
+        <li>Clique em <button type="button" id="open-wikiaves" class="inline">Abrir Wikiaves</button> — abre o site numa nova aba.</li>
+        <li>Nessa aba, clique no favorito <strong>Zine Bicipá</strong>. As fotos chegam aqui sozinhas.</li>
+        <li>Deixe a aba aberta enquanto quiser trocar fotos (botão “trocar” na lista de espécies).</li>
+      </ol>
+      <p class="muted" id="wikiaves-progress"></p>
+      <p class="notice">As fotos do Wikiaves são dos fotógrafos (todos os direitos reservados). Peça autorização a cada autor antes de imprimir — a lista de fotógrafos fica no fim da página.</p>
+    </section>
+
+    <section class="card" id="step-pdf" hidden>
+      <h2><span class="step">3</span> PDF</h2>
+      <div class="actions">
+        <a id="download" class="button" download>Baixar PDF</a>
+      </div>
+      <iframe id="preview" title="Pré-visualização do PDF"></iframe>
+      <details class="howto">
+        <summary>Como imprimir e dobrar</summary>
+        <ol>
+          <li>Imprima em A4, frente e verso, em escala real (100%, sem "ajustar à página").</li>
+          <li>Dobre a folha ao meio no sentido do comprimento e depois em quatro, marcando as dobras.</li>
+          <li>Abra e corte a linha central horizontal entre os dois painéis do meio.</li>
+          <li>Dobre ao meio no comprimento, empurre as pontas para o centro e feche como um livreto — a capa fica por fora.</li>
+          <li>Desdobrando o zine, o verso vira um pôster com as fotos numeradas.</li>
+        </ol>
+      </details>
+    </section>
+
+    <section class="card" id="step-species" hidden>
+      <h2>Espécies</h2>
+      <p class="muted" id="species-summary"></p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Foto</th><th>Espécie</th><th>Última vez</th><th>Crédito</th></tr></thead>
+          <tbody id="species-body"></tbody>
+        </table>
+      </div>
+      <div id="photographers" hidden>
+        <h3>Fotógrafos (<span id="photographers-count"></span>) — para pedir autorização</h3>
+        <ul id="photographers-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    Dados: <a href="https://ebird.org" target="_blank" rel="noopener">eBird</a> ·
+    Fotos: <a href="https://www.wikiaves.com.br" target="_blank" rel="noopener">Wikiaves</a> ·
+    Feito para o <a href="https://anaju.xyz" target="_blank" rel="noopener">Bicipassarinhar</a>
+  </footer>
+
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="vendor/assets.js"></script>
+  <script src="js/place.js"></script>
+  <script src="js/bookmarklet.js"></script>
+  <script src="js/ebird.js"></script>
+  <script src="js/photos.js"></script>
+  <script src="js/wikiaves.js"></script>
+  <script src="js/zine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

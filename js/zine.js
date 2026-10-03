@@ -2,19 +2,15 @@
 //
 // The zine is a 16-page A7 booklet. Pages are drawn one by one through a
 // panel context (local A7 coordinates), then imposed onto the two sides of
-// a landscape A4 sheet (4×2 panels, top row upside down):
+// a landscape A4 sheet (4×2 panels, top row upside down), following the
+// arrangement in examples/zine-as-aves-do-parque-linear-nove-de-julho.pdf.pdf:
 //
-//   side 1 (outside)                 side 2 (inside)
+//   sheet 1                          sheet 2
 //   ┌────┬────┬────┬────┐            ┌────┬────┬────┬────┐
-//   │  5 │ 12 │  9 │  8 │ ← 180°     │  7 │ 10 │ 11 │  6 │ ← 180°
+//   │  7 │  6 │  5 │  4 │ ← 180°     │ 15 │ 14 │ 13 │ 12 │ ← 180°
 //   ├────┼────┼────┼────┤            ├────┼────┼────┼────┤
-//   │  4 │ 13 │ 16 │  1 │            │  2 │ 15 │ 14 │  3 │
+//   │ 16 │  1 │  2 │  3 │            │  8 │  9 │ 10 │ 11 │
 //   └────┴────┴────┴────┘            └────┴────┴────┴────┘
-//
-// Print duplex flipping on the short edge, lay the sheet inside-up, then
-// fold: right half over left, top half down, left half over right (that
-// last fold is the spine). Trim the top and right folded edges to free the
-// pages. The imposition was derived by simulating exactly these folds.
 //
 // Page plan: 1 front cover · 2–13 six spreads, photos on the left page and
 // their checklist on the right (14 species each) · 14–15 notes · 16 back.
@@ -44,8 +40,8 @@ const Zine = (() => {
 
   // Page numbers per sheet side, left to right; the top row is upside down.
   const SHEET = [
-    { top: [5, 12, 9, 8], bottom: [4, 13, 16, 1] }, // outside (cover)
-    { top: [7, 10, 11, 6], bottom: [2, 15, 14, 3] }, // inside
+    { top: [7, 6, 5, 4], bottom: [16, 1, 2, 3] },
+    { top: [15, 14, 13, 12], bottom: [8, 9, 10, 11] },
   ];
   // page → {side, col, row, rotated}
   const IMPOSITION = {};

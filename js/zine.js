@@ -347,9 +347,12 @@ const Zine = (() => {
     for (; y <= p.h - 20; y += 18) p.line(left, y, right, y);
   }
 
-  function credits(locId, hasPhotos) {
+  function credits(locId, photos) {
     const parts = [];
-    if (hasPhotos) parts.push('Fotos: WikiAves (wikiaves.com.br), autoria indicada em cada foto.');
+    const licenses = [...new Set(photos.map((p) => Photos.licenseLabel(p.license)).filter(Boolean))].sort();
+    if (photos.length) {
+      parts.push(`Fotos: iNaturalist, sob licenças ${licenses.join(', ')}; autoria indicada em cada foto.`);
+    }
     parts.push(`Espécies observadas mais recentemente segundo o eBird — ebird.org/hotspot/${locId}`);
     return parts;
   }
@@ -368,7 +371,8 @@ const Zine = (() => {
       case 'back':
         drawBackCover(doc, p, {
           phrase: ctx.opts.phrase,
-          credits: credits(ctx.data.locId, ctx.images.photos.some(Boolean)),
+          credits: credits(ctx.data.locId,
+            ctx.species.filter((sp, i) => ctx.images.photos[i]).map((sp) => sp.photo)),
           images: ctx.images,
         });
         break;
